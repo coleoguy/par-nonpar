@@ -1,5 +1,4 @@
 library(doSNOW)
-library(ggplot2)
 
 source("functions.R")
 
