@@ -1,12 +1,6 @@
 library(doSNOW)
-library(ggplot2)
 
 source("functions.R")
-
-# Store data as parsed vs. expanded
-
-flag <- "doparsed"
-# flag <- "doexpanded"
 
 # Initial Population
 pop.size <- 1000
@@ -21,61 +15,52 @@ generations <- 3
 NumberClusters <- 4
 cl <- makeCluster(NumberClusters, outfile = "")
 registerDoSNOW(cl)
-iter <- 10
 
-
+iter <- 5
+iter.results <- list()
 
 parsed <- as.data.frame(matrix(NA, 1, 6))
 colnames(parsed) <- c("frqX","frqY","model","h","r","s")
 counter <- 1
 
-par.results <- list()
-par.results1 <- list()
-par.results2 <- list()
-par.results3 <- list()
-par.results4 <- list()
-
 
 # Type of fusions to introduce
 # Possible models: (auto.and.) allXY, allX, allY, nonparX, parX, nonparY, parY
 models <- c("auto.and.nonparX", "auto.and.parX", "auto.and.nonparY", "auto.and.parY")
-for(m in 1:length(models)){
+for(o in 1:length(models)){
   
-  model <- models[m]    
+  model <- models[o]    
   # Dominance factor of the female benefit allele (allele 1)
   # 1 = dominant, 0.5 = additive, 0 = recessive
   hs <- c(0,0.5,1)
-  for(o in 1:length(hs)){
+  for(n in 1:length(hs)){
     
-    h <- hs[o]
+    h <- hs[n]
     # Recombination distance between SAL locus and
     # the point that is fused to the sex chromosome
     rs <- c(0.1, 0.2, 0.4)
-    for(l in 1:length(rs)){
+    for(m in 1:length(rs)){
       
-      r <- rs[l]
+      r <- rs[m]
       # Selection coefficient for SAL
       ss <- seq(from = 0.1, to = 1, length = 10)
       for(k in 1:length(ss)){
         s <- ss[k]
         
-        # This sets up results with each row being a generation
-        results <- as.data.frame(matrix(NA, 1, length(pop.gam)))
-        colnames(results) <- names(pop.gam)
+        # This sets up results with each row being an iteration
+        results <- as.data.frame(matrix(NA, 1, 18))
+        colnames(results) <- c("XE0N","XE0P","XE0U","XE1N","XE1P","XE1U","XS0N","XS0P","XS0U",
+                               "XS1N","XS1P","XS1U","YS0N","YS0P","YS0U","YS1N","YS1P","YS1U")
         
-        # Set number of iterations
-        for(j in 1:iter) {
+        iter.results <- foreach(j = 1:iter,  .verbose = T) %dopar% {
           
           pop.gam <- getInitialPop(pop.size = pop.size)
-          
-          
           
           # Number of mutant individuals in a given generation
           num.mutes <- rpois(n=generations, lambda = mut.prob * pop.size)
           
           for(i in 1:generations){
-            print(i)
-
+            
             # Get Juveniles based on initial gamete pool
             pop.juv <- getJuveniles(pop.gam, pop.size)
             
@@ -93,42 +78,36 @@ for(m in 1:length(models)){
             
             # Mutations
             pop.gam <- perfMutation(pop.gam, num.mutes, model)
+            return(pop.gam)
+
           }
-          results[j, ] <- pop.gam
-        }
-        model.results[[k]] <- results
-      }
+          results[j, ] <- iter.results[[j]]
           
-        
-        
-        
-          frqX <- sum(par.results1[[j]][generations, c(1,2,4,5,7,8,10,11)]) / sum(par.results1[[j]][generations, 1:12])
-          frqY <- sum(par.results1[[j]][generations, c(13,14,16,17)]) / sum(par.results1[[j]][generations, 13:18])
+          frqX <- sum(results[j, c(1,2,4,5,7,8,10,11)]) / sum(results[j, 1:12])
+          frqY <- sum(results[j, c(13,14,16,17)]) / sum(results[j, 13:18])
           parsed[counter, (1:6)] <- c(frqX, frqY, model, h, r, s)
           counter <- counter + 1
           print(counter)
-          
+        
         }
-        par.results2[[k]] <- par.results1
-        names(par.results2)[k] <- c(paste("s =", s, sep = " "))
+
       }
-      
-      par.results3[[l]] <- par.results2
-      names(par.results3)[l] <- c(paste("r =", r, sep = " "))
-      
+
     }
-    
-    par.results4[[o]] <- par.results3
-    names(par.results4)[o] <- c(paste("h =", h, sep = " "))
-    
+
   }
-  
-  par.results[[m]] <- par.results4
-  names(par.results)[m] <- c(paste("model =", model, sep = " "))
+
 }
+
 stopCluster(cl)
 
+X <- data.frame(parsed[, c(1,3:6)])
+Y <- data.frame(parsed[, 2:6])
+colnames(X)[1] <- colnames(Y)[1] <- "Freq"
+both <- rbind(X, Y)
+both$chromosome <- rep(c("X","Y"), each = nrow(X))
 
+long.results <- both
 
 
 

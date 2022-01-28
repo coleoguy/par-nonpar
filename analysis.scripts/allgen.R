@@ -9,44 +9,46 @@ pop.size <- 1000
 mut.prob <- 1/1000
 
 # Generations with columns being gamete types
-generations <- 1000
+generations <- 5
 
 par.results <- list()
-par.results1 <- list()
-par.results2 <- list()
-par.results3 <- list()
-par.results4 <- list()
+iter.results <- list()
+s.results <- list()
+r.results <- list()
+h.results <- list()
+model.results <- list()
 
 # Set number of clusters
-NumberClusters <- 100
+NumberClusters <- 2
 cl <- makeCluster(NumberClusters, outfile = "")
 registerDoSNOW(cl)
+iter <- 3
 
 # Type of fusions to introduce
 # Possible models: (auto.and.) allXY, allX, allY, nonparX, parX, nonparY, parY
 models <- c("auto.and.nonparX", "auto.and.parX", "auto.and.nonparY", "auto.and.parY")
-for(m in 1:length(models)){
+for(o in 1:length(models)){
 
-model <- models[m]    
+model <- models[o]    
 # Dominance factor of the female benefit allele (allele 1)
 # 1 = dominant, 0.5 = additive, 0 = recessive
 hs <- c(0,0.5,1)
-  for(o in 1:length(hs)){
+  for(n in 1:length(hs)){
   
-    h <- hs[o]
+    h <- hs[n]
   # Recombination distance between SAL locus and
   # the point that is fused to the sex chromosome
   rs <- c(0.1, 0.2, 0.4)
-  for(l in 1:length(rs)){
+  for(m in 1:length(rs)){
     
-    r <- rs[l]
+    r <- rs[m]
   # Selection coefficient for SAL
     ss <- seq(from = 0.1, to = 1, length = 10)
     for(k in 1:length(ss)){
     s <- ss[k]
         
         # Set number of iterations
-          par.results1 <- foreach(j = 1:100, .verbose = T ) %dopar% {
+          iter.results <- foreach(j = 1:iter, .verbose = T ) %dopar% {
             
             pop.gam <- getInitialPop(pop.size = pop.size)
         
@@ -82,21 +84,22 @@ hs <- c(0,0.5,1)
               
               
             }
-            par.results1[[j]] <- results
+            iter.results[[j]] <- results
+          }
+          s.results[[k]] <- iter.results
+          names(s.results)[k] <- s
         }
-      par.results2[[k]] <- par.results1
-      names(par.results2)[k] <- c(paste("s =", s, sep = " "))
+        r.results[[m]] <- s.results
+        names(r.results)[m] <- r
       }
-    par.results3[[l]] <- par.results2
-    names(par.results3)[l] <- c(paste("r =", r, sep = " "))
+      h.results[[n]] <- r.results
+      names(h.results)[n] <- h
     }
-  par.results4[[o]] <- par.results3
-  names(par.results4)[o] <- c(paste("h =", h, sep = " "))
+    model.results[[o]] <- h.results
+    names(model.results)[o] <- model
   }
-par.results[[m]] <- par.results4
-names(par.results)[m] <- c(paste("model =", model, sep = " "))
-}
-stopCluster(cl)
+  par.results <- model.results
+  stopCluster(cl)
 
 
 
