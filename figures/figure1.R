@@ -1,4 +1,6 @@
 library(stringr)
+library(ggraptR)
+library(dplyr)
 results <- read.csv("../results/results.csv")
 results$h <- as.numeric(str_sub(results$h, start=5))
 results$r <- as.numeric(str_sub(results$r, start=5))
@@ -21,14 +23,34 @@ R1 <- both[both$r == 0.1, ]
 R2 <- both[both$r == 0.2, ]
 R4 <- both[both$r == 0.4, ]
 
+agg <- both %>%
+  group_by(r,s,h,model,chromosome) %>%
+  summarise_at(vars(Freq), list(Freq_median = ~median(., na.rm=TRUE)))
+
+aggR1 <- R1 %>%
+  group_by(s,h,model,chromosome) %>%
+  summarise_at(vars(Freq), list(Freq_mean = ~mean(., na.rm=TRUE), Freq_median = ~median(., na.rm=TRUE)))
+
+aggR2 <- R2 %>%
+  group_by(s,h,model,chromosome) %>%
+  summarise_at(vars(Freq), list(Freq_median = ~median(., na.rm=TRUE)))
+
+aggR4 <- R4 %>%
+  group_by(s,h,model,chromosome) %>%
+  summarise_at(vars(Freq), list(Freq_median = ~median(., na.rm=TRUE))) %>%
+  ungroup()
+
+
 # TODO
-ggplot(R4, aes(y=Freq_median, x=s)) + 
-  geom_point(aes(colour=chromosome), stat="identity", position="identity", alpha=0.5, size=3) + 
+p1 <- ggplot(aggR1, aes(y=Freq_median, x=s)) + 
+  geom_jitter(data = R1, aes(colour=chromosome, y = Freq, x = s), stat="identity", alpha=0.05, size=0.1,width = 0.01) + 
+  geom_point(aes(colour=chromosome, fill=chromosome), shape = 21,colour = "black", stat="identity", position="identity", size=3) +
   facet_grid(model ~ h, scales="free_y") + theme_bw() + 
   theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + 
   scale_size(range=c(1, 3)) + xlab("s") + ylab("Freq_median")
+p1
+ggsave(plot = p1, "figure1.png", width = 10, height = 7, type = "cairo-png")
 
-ggraptR(R1)
 
 
 
