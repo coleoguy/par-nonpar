@@ -60,26 +60,16 @@ group.labs <- c("r1nonpar"="Non-PAR fusion","r1par"= "PAR fusion", "r4nonpar"= "
 r.labs <- c("0.1" = "r = 0.1","0.4"= "r = 0.4")
 
 
-# Median point plot
+
+
+# Dotted line plot
 p1 <- ggplot(agg, aes(y=Freq_median, x=s)) + 
   geom_point(data = data, aes(colour=chromosome, fill = chromosome, y = Freq, x = s), stat="identity", alpha=0.05, size=0.1, position=position_jitterdodge(jitter.width = 0.03, dodge.width=0.1)) + 
-  geom_point(aes(colour=chromosome, fill=chromosome), shape = 21,colour = "black", alpha = 0.5, stat="identity", position=position_dodge(width = 0.1), size=3) +
+  geom_point(aes(colour=chromosome, fill=chromosome), shape = 21,colour = "black", alpha = 0.5, stat="identity",position=position_dodge(width = 0.1),  size=2) +
+  geom_line(aes(colour=chromosome),stat="identity",position=position_dodge(width = 0.1), ) +
   facet_grid(r + group ~ h, scales="free_y", labeller = labeller(h = h.labs, group = group.labs, r = r.labs)) +
   theme_light() + 
   theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + 
   scale_size(range=c(1, 3)) + xlab("s") + ylab("Fused chromosome frequency")
 p1
 ggsave(plot = p1, "figure1.png", width = 10, height = 7, type = "cairo-png")
-
-
-# Dotted line plot
-p2 <- ggplot(agg, aes(y=Freq_median, x=s)) + 
-  geom_point(data = data, aes(colour=chromosome, fill = chromosome, y = Freq, x = s), stat="identity", alpha=0.05, size=0.1, position=position_jitterdodge(jitter.width = 0.03, dodge.width=0.1)) + 
-  geom_point(aes(colour=chromosome, fill=chromosome), shape = 21,colour = "black", alpha = 0.5, stat="identity", position=position_dodge(width = 0.1), size=2) +
-  geom_line(aes(colour=chromosome),stat="identity") +
-  facet_grid(r + group ~ h, scales="free_y", labeller = labeller(h = h.labs, group = group.labs, r = r.labs)) +
-  theme_light() + 
-  theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) + 
-  scale_size(range=c(1, 3)) + xlab("s") + ylab("Fused chromosome frequency")
-p2
-ggsave(plot = p2, "figure1.2.png", width = 10, height = 7, type = "cairo-png")
