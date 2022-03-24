@@ -73,3 +73,4 @@ p1 <- ggplot(agg, aes(y=Freq_median, x=s)) +
   scale_size(range=c(1, 3)) + xlab("s") + ylab("Fused chromosome frequency")
 p1
 ggsave(plot = p1, "figure1.png", width = 10, height = 7, type = "cairo-png")
+ggsave(plot = p1, "figure1.pdf", width = 10, height = 7)

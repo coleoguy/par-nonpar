@@ -22,5 +22,5 @@ for(i in 1:length(par.results)){   # models
   }
 }
 
-save(results, file = "parsedx.RData")
-
+save(results, file = "parseddrift.RData")
+write.csv(results, file = "parseddrift.csv")
