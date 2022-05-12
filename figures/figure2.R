@@ -58,7 +58,11 @@ aggs <- rbind(agg1,agg2,agg3,agg4,agg5,agg6)
 
 
 p1 <- ggplot(aggs, aes(x=s, y=Freq_mean, group = group, color=group)) + 
-  geom_line() 
+  geom_line() +
+  geom_hline(yintercept=0) +
+  ggtitle("Mutation-Drift Equilibrium") + ylab("Mean Fusion Frequency") + labs(color = "Model") +
+  theme_light() + 
+  theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) 
 p1
 
 ggsave(plot = p1, "figure2.png", width = 10, height = 7, type = "cairo-png")
