@@ -26,19 +26,19 @@ iter <- 100
 
 # Type of fusions to introduce
 # Possible models: (auto.and.) allXY, allX, allY, nonparX, parX, nonparY, parY
-models <- c("auto.and.parX")
+models <- c("auto.and.nonparX","auto.and.parX","auto.and.nonparY","auto.and.parY")
 for(o in 1:length(models)){
   
   model <- models[o]    
   # Dominance factor of the female benefit allele (allele 1)
   # 1 = dominant, 0.5 = additive, 0 = recessive
-  hs <- c(0.5)
+  hs <- c(0,0.5,1)
   for(n in 1:length(hs)){
     
     h <- hs[n]
     # Recombination distance between SAL locus and
     # the point that is fused to the sex chromosome
-    rs <- c(0.1)
+    rs <- c(0.4)
     for(m in 1:length(rs)){
       
       r <- rs[m]
@@ -99,7 +99,7 @@ for(o in 1:length(models)){
   names(model.results)[o] <- model
 }
 par.results <- model.results
-save(par.results, file = "driftdata10.RData")
+save(par.results, file = "s0h3r0.4m4data9.RData")
 stopCluster(cl)
 
 

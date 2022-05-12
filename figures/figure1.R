@@ -1,39 +1,43 @@
 library(stringr)
 library(ggraptR)
 library(dplyr)
-results <- read.csv("../results/results.csv")
-results$h <- as.numeric(str_sub(results$h, start=5))
-results$r <- as.numeric(str_sub(results$r, start=5))
-results$s <- as.numeric(str_sub(results$s, start=5))
 
-
-
-
-
-X <- data.frame(results[, c(1,3:6)])
-Y <- data.frame(results[, 2:6])
-colnames(X)[1] <- colnames(Y)[1] <- "Freq"
-both <- rbind(X, Y)
-both$chromosome <- rep(c("X","Y"), each = 360000)
-
-# library(ggraptR)
-# ggraptR(both)
-
-R1 <- both[both$r == 0.1, ]
-R2 <- both[both$r == 0.2, ]
-R4 <- both[both$r == 0.4, ]
+########
+# results <- read.csv("../results/results.csv")
+# results$h <- as.numeric(str_sub(results$h, start=5))
+# results$r <- as.numeric(str_sub(results$r, start=5))
+# results$s <- as.numeric(str_sub(results$s, start=5))
+# 
+# 
+# 
+# 
+# 
+# X <- data.frame(results[, c(1,3:6)])
+# Y <- data.frame(results[, 2:6])
+# colnames(X)[1] <- colnames(Y)[1] <- "Freq"
+# both <- rbind(X, Y)
+# both$chromosome <- rep(c("X","Y"), each = 360000)
+# 
+# # library(ggraptR)
+# # ggraptR(both)
+# 
+# R1 <- both[both$r == 0.1, ]
+# R2 <- both[both$r == 0.2, ]
+# R4 <- both[both$r == 0.4, ]
+#########
+load("~/par-nonpar/results/both.RData")
 
 data0 <- both[both$r != 0.2, ]
 
-data1 <- filter(data0, !(model == "model = auto.and.nonparY" & chromosome == "X"))
-data2 <- filter(data1, !(model == "model = auto.and.nonparX" & chromosome == "Y"))
-data3 <- filter(data2, !(model == "model = auto.and.parY"))
+data1 <- filter(data0, !(model == "auto.and.nonparY" & chromosome == "X"))
+data2 <- filter(data1, !(model == "auto.and.nonparX" & chromosome == "Y"))
+data3 <- filter(data2, !(model == "auto.and.parY"))
 
 data4 <- data3
-data4$group[(data4$r == 0.1 & (data4$model == "model = auto.and.nonparY"|data4$model == "model = auto.and.nonparX"))] <- "r1nonpar"
-data4$group[(data4$r == 0.4 & (data4$model == "model = auto.and.nonparY"|data4$model == "model = auto.and.nonparX"))] <- "r4nonpar"
-data4$group[(data4$r == 0.1 & data4$model == "model = auto.and.parX")] <- "r1par"
-data4$group[(data4$r == 0.4 & data4$model == "model = auto.and.parX")] <- "r4par"
+data4$group[(data4$r == 0.1 & (data4$model == "auto.and.nonparY"|data4$model == "auto.and.nonparX"))] <- "r1nonpar"
+data4$group[(data4$r == 0.4 & (data4$model == "auto.and.nonparY"|data4$model == "auto.and.nonparX"))] <- "r4nonpar"
+data4$group[(data4$r == 0.1 & data4$model == "auto.and.parX")] <- "r1par"
+data4$group[(data4$r == 0.4 & data4$model == "auto.and.parX")] <- "r4par"
 
 data <- data4
 

@@ -22,5 +22,7 @@ for(i in 1:length(par.results)){   # models
   }
 }
 
-save(results, file = "parseddrift.RData")
-write.csv(results, file = "parseddrift.csv")
+
+
+save(results, file = "testparsed.RData")
+write.csv(results, file = "testparsed.csv")
