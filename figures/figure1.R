@@ -21,13 +21,15 @@ library(dplyr)
 # # library(ggraptR)
 # # ggraptR(both)
 # 
-# R1 <- both[both$r == 0.1, ]
-# R2 <- both[both$r == 0.2, ]
-# R4 <- both[both$r == 0.4, ]
+
 #########
 load("~/par-nonpar/results/both.RData")
 
 data0 <- both[both$r != 0.2, ]
+
+R1 <- both[both$r == 0.1, ]
+R2 <- both[both$r == 0.2, ]
+R4 <- both[both$r == 0.4, ]
 
 data1 <- filter(data0, !(model == "auto.and.nonparY" & chromosome == "X"))
 data2 <- filter(data1, !(model == "auto.and.nonparX" & chromosome == "Y"))
