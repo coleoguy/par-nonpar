@@ -1,5 +1,6 @@
 oldresults <- read.csv("../results/oldparsed.csv")
 r1driftresults <- read.csv("../results/parsedr1drift.csv")
+r2driftresults <- read.csv("../results/parsedr2drift.csv")
 r4driftresults <- read.csv("../results/parsedr4drift.csv")
 
 results1 <- oldresults[,2:7]
@@ -10,9 +11,10 @@ results1$model <- str_sub(results1$model, start=9)
 
 
 results2 <- r1driftresults[,2:7]
-results3 <- r4driftresults[,2:7]
+results3 <- r2driftresults[,2:7]
+results4 <- r4driftresults[,2:7]
 
-results <- rbind(results1, results2, results3)
+results <- rbind(results1, results2, results3, results4)
 
 ordered <- results[order(results$model,results$h,results$r,results$s),]
 save(ordered, file = "ordered.RData")

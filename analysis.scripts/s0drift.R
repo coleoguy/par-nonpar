@@ -38,7 +38,7 @@ for(o in 1:length(models)){
     h <- hs[n]
     # Recombination distance between SAL locus and
     # the point that is fused to the sex chromosome
-    rs <- c(0.4)
+    rs <- c(0.2)
     for(m in 1:length(rs)){
       
       r <- rs[m]
@@ -99,7 +99,7 @@ for(o in 1:length(models)){
   names(model.results)[o] <- model
 }
 par.results <- model.results
-save(par.results, file = "s0h3r0.4m4data9.RData")
+save(par.results, file = "s0h3r0.2m4data10.RData")
 stopCluster(cl)
 
 
