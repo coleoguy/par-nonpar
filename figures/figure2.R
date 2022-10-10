@@ -1,6 +1,8 @@
 # this script aggregates results and saves out files for plotting
 library(stringr)
 library(dplyr)
+library(ggplot2)
+library(wesanderson)
 
 load("../results/sim.results.RData")
 
@@ -27,11 +29,13 @@ for(i in 1:nrow(dat)){
 dat$chrom <- chrom
 rm(list=ls()[-4])
 
+facet.labs <- c(`0` = "h = 0", `0.5` = "h = 0.5", `1` = "h = 1")
 
-ggplot(dat, aes(x=s, y=Freq)) + 
-  geom_line(aes(color = as.character(r), linetype=chrom)) +
+p1 <- ggplot(dat) + 
+  geom_line(dat[dat$model == "nonpar",], mapping = aes(x=s, y=Freq,color = as.character(r), linetype=chrom)) +
+  geom_line(dat[dat$model == "par",], mapping = aes(x=s, y=Freq,color = as.character(r), linetype=chrom)) +
   geom_hline(yintercept=0) +
-  facet_grid(. ~ h) +
+  facet_grid(. ~ h, labeller = as_labeller(facet.labs)) +
   ylab("deviation from MDE") + labs(color = "Distance") + xlab("selection coefficient") +
   scale_colour_manual(labels = c("r=0.1", "r=0.2","r=0.4"), values = c(wes_palette("Darjeeling1", n=3, type="discrete"))) +
   scale_linetype_manual("Chromosome",values=c("X"=2,"Y"=1)) +
@@ -40,5 +44,9 @@ ggplot(dat, aes(x=s, y=Freq)) +
   annotate(geom="text", x=0.15, y=0.25, label="Non-PAR", size=5) +
   annotate(geom="text", x=0.15, y=-0.08, label="PAR       ", size=5) +
   theme_light() + 
-  theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) 
-#
+  theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5))  +
+  theme(strip.text = element_text(color = "black")) +
+  theme(strip.background = element_rect(fill = "white"))
+
+ggsave(plot = p1, "figure2.png", width = 25, height = 7, type = "cairo-png")
+ggsave(plot = p1, "figure2.pdf", width = 25, height = 7)

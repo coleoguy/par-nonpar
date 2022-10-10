@@ -43,7 +43,7 @@ for(o in 1:length(models)){
       
       r <- rs[m]
       # Selection coefficient for SAL
-      ss <- seq(from = 0.1, to = 1, length = 10)
+      ss <- seq(from = 0, to = 1, length = 11)
       for(k in 1:length(ss)){
         s <- ss[k]
         
