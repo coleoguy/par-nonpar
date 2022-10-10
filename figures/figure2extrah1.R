@@ -3,12 +3,12 @@ library(ggplot2)
 library(wesanderson)
 library(dplyr)
 
-# KW - script for making figure for h = 0.5
+# KW - script for making figure for h = 1
 
 load("~par-nonpar/results/both.RData")
 
+both <- filter(both, !(h == 0.5))
 both <- filter(both, !(h == 0))
-both <- filter(both, !(h == 1))
 
 agg0 <- both %>%
   group_by(model,r,s) %>%
@@ -140,19 +140,19 @@ aggs$linetype <- as.factor(aggs$linetype)
 p1 <- ggplot(aggs, aes(x=s, y=Freq_mean, group = group, color = cols, linetype=linetype)) + 
   geom_line() +
   geom_hline(yintercept=0) +
-  ylab("deviation from MDE") + labs(color = "Model") + xlab("selection coefficient") +
+  ylab("Mean Deviation from MDE") + labs(color = "Model") + xlab("selection coefficient") +
   scale_colour_manual(labels = c("r=0.1", "r=0.2","r=0.4"), values = c(wes_palette("Darjeeling1", n=3, type="discrete"))) +
   scale_linetype_manual("Chromosome",values=c("X"=2,"Y"=1)) +
   scale_x_continuous(breaks = seq(0, 1, by = 0.2)) +
   ylim(-0.12,0.275) +
   annotate(geom="text", x=0.15, y=0.25, label="Non-PAR", size=5) +
   annotate(geom="text", x=0.15, y=-0.08, label="PAR       ", size=5) +
-  annotate(geom="text", x=0.6, y=0.275, label="h = 0.5", size=6) +
+  annotate(geom="text", x=0.6, y=0.275, label="h = 1", size=6) +
   theme_light() + 
   theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5)) 
 p1
 
-ggsave(plot = p1, "figure2.png", width = 10, height = 7, type = "cairo-png")
-ggsave(plot = p1, "figure2.pdf", width = 10, height = 7)
+ggsave(plot = p1, "figure2extrah1.png", width = 10, height = 7, type = "cairo-png")
+ggsave(plot = p1, "figure2extrah1.pdf", width = 10, height = 7)
 
 
