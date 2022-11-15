@@ -35,16 +35,16 @@ p1 <- ggplot(dat) +
   geom_line(dat[dat$model == "nonpar",], mapping = aes(x=s, y=Freq,color = as.character(r), linetype=chrom)) +
   geom_line(dat[dat$model == "par",], mapping = aes(x=s, y=Freq,color = as.character(r), linetype=chrom)) +
   geom_hline(yintercept=0) +
-  facet_grid(. ~ h, labeller = as_labeller(facet.labs)) +
+  facet_grid(rows=h ~ ., labeller = as_labeller(facet.labs)) +
   ylab("deviation from MDE") + labs(color = "Distance") + xlab("selection coefficient") +
   scale_colour_manual(labels = c("r=0.1", "r=0.2","r=0.4"), values = c(wes_palette("Darjeeling1", n=3, type="discrete"))) +
   scale_linetype_manual("Chromosome",values=c("X"=2,"Y"=1)) +
   scale_x_continuous(breaks = seq(0, 1, by = 0.2)) +
   ylim(-0.12,0.275) +
-  annotate(geom="text", x=0.15, y=0.25, label="Non-PAR", size=5) +
-  annotate(geom="text", x=0.15, y=-0.08, label="PAR       ", size=5) +
+  annotate(geom="text", x=0.15, y=0.25, label="Non-PAR", size=3) +
+  annotate(geom="text", x=0.15, y=-0.08, label="PAR       ", size=3) +
   theme_light() + 
-  theme(text=element_text(family="sans", face="plain", color="#000000", size=15, hjust=0.5, vjust=0.5))  +
+  theme(text=element_text(family="sans", face="plain", color="#000000", size=10, hjust=0.5, vjust=0.5))  +
   theme(strip.text = element_text(color = "black")) +
   theme(strip.background = element_rect(fill = "white"))
 
