@@ -6,19 +6,8 @@ library(ggplot2)
 library(wesanderson)
 
 load("../results/sim.results.RData")
-res.ver2 <- read.csv("../results/agg.dat.csv")
-modchrom <- rep(NA, 792000)
-for(i in 1:nrow(both)){
-  print(i)
-  modchrom[i] <- str_sub(both$model[i], start=-1)
-}
-both <- both[modchrom == both$chromosome, ]
-
-
 
 both <- both[,-6]
-
-
 foo <- aggregate( Freq ~ model + h + r+s, both, mean)
 mutdrift <- foo[foo$s == 0,]
 
@@ -52,13 +41,13 @@ p1 <- ggplot(dat) +
   scale_colour_manual(labels = c("r=0.1", "r=0.2","r=0.4"), values = c(wes_palette("Darjeeling1", n=3, type="discrete"))) +
   scale_linetype_manual("Chromosome",values=c("X"=2,"Y"=1)) +
   scale_x_continuous(breaks = seq(0, 1, by = 0.2)) +
-  ylim(-0.12,0.54) +
-  annotate(geom="text", x=0.1, y=0.5, label="Non-PAR", size=3) +
-  annotate(geom="text", x=0.1, y=-0.08, label="PAR       ", size=3) +
+  ylim(-0.12,0.275) +
+  annotate(geom="text", x=0.15, y=0.25, label="Non-PAR", size=3) +
+  annotate(geom="text", x=0.15, y=-0.08, label="PAR       ", size=3) +
   theme_light() + 
   theme(text=element_text(family="sans", face="plain", color="#000000", size=10, hjust=0.5, vjust=0.5))  +
   theme(strip.text = element_text(color = "black")) +
   theme(strip.background = element_rect(fill = "white"))
 
-ggsave(plot = p1, "figure2.png", width = 4.5, height = 8, type = "cairo-png")
-ggsave(plot = p1, "figure2.pdf", width = 4.5, height = 8)
+ggsave(plot = p1, "figure2.png", width = 25, height = 7, type = "cairo-png")
+ggsave(plot = p1, "figure2.pdf", width = 25, height = 7)
