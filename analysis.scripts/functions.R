@@ -118,9 +118,9 @@ getJuveniles <- function(pop.gam, pop.size){
 }
 
 popFit <- function(pop.juv, s, h){
-  genotype.fit.mat  <- matrix(c(1+s, 1, 1+(1-h)*s,
-                                1+h*s, 1, 1+s),
-                              3, 2, byrow = TRUE)
+  genotype.fit.mat  <- matrix(c(1+s, 1+h*s, 1, 
+                                1/(1+s), 1/(1+h*s), 1),
+                              3, 2, byrow = F)
   colnames(genotype.fit.mat) <- c("male", "female")
   rownames(genotype.fit.mat) <- c("00","01","11")
   pop.fit <- pop.juv

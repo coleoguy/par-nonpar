@@ -1,4 +1,5 @@
 # this script aggregates results and saves out files for plotting
+# it is also vertical not horizontal
 library(stringr)
 library(dplyr)
 library(ggplot2)
