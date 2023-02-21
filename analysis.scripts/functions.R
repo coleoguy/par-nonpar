@@ -174,8 +174,6 @@ perfSeln <- function(pop.juv, pop.fits){
   return(pop.adu)
 }
 
-
-
 perfGameto <- function(pop.adu, r){
   recom.table.xx <- matrix(0,36,6)
   colnames(recom.table.xx) <- c("XE0N", "XE0P", "XE0U", "XE1N", "XE1P", "XE1U")
@@ -516,7 +514,6 @@ perfMutation <- function(pop.gam, num.mutes, model){
    }
   return(pop.gam)
 }
-
 
 GetFreqs <- function(results, val){
 
