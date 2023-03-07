@@ -1,0 +1,98 @@
+library(doSNOW)
+
+source("functions.R")
+
+# Initial Population
+pop.size <- 1000
+
+# Probability of an individual having a mutation
+mut.prob <- 1/1000
+
+# Generations with columns being gamete types
+generations <- 1000
+
+# Set number of clusters
+NumberClusters <- 8
+cl <- makeCluster(NumberClusters, outfile = "")
+registerDoSNOW(cl)
+
+iter <- 100
+iter.results <- list()
+
+# This sets up results with each row being an iteration
+results <- as.data.frame(matrix(NA, 1, 18))
+colnames(results) <- c("XE0N","XE0P","XE0U","XE1N","XE1P","XE1U","XS0N","XS0P","XS0U",
+                       "XS1N","XS1P","XS1U","YS0N","YS0P","YS0U","YS1N","YS1P","YS1U")
+# Type of fusions to introduce
+# Possible models: (auto.and.) allXY, allX, allY, nonparX, parX, nonparY, parY
+models <- c("auto.and.nonparY")
+for(i in 1:length(models)){
+  
+  model <- models[i]
+  # Dominance factor of the female benefit allele (allele 1)
+  # 1 = dominant, 0.5 = additive, 0 = recessive
+  hs <- c(1)
+  for(j in 1:length(hs)){
+    
+    h <- hs[j]
+    # Recombination distance between SAL locus and
+    # the point that is fused to the sex chromosome
+    for(k in 1){
+      
+      r <- c(0.1)
+      # Selection coefficient for SAL
+
+      for(m in 1){
+        s <- c(0.3)
+        
+        iter.results <- foreach(n = 1:iter,  .verbose = T) %dopar% {
+          
+          pop.gam <- getInitialPop(pop.size = pop.size)
+          
+          # Number of mutant individuals in a given generation
+          num.mutes <- rpois(n=generations, lambda = mut.prob * pop.size)
+          
+          for(p in 1:generations){
+            
+            # Get Juveniles based on initial gamete pool
+            pop.juv <- getJuveniles(pop.gam, pop.size)
+            
+            # Get population fitnesses
+            pop.fits <- popFit(pop.juv, s = s, h = h)
+            
+            # Viability Selection
+            pop.adu <- perfSeln(pop.juv, pop.fits)
+            
+            # Recombination
+            pop.recom <- perfGameto(pop.adu, r = r)
+            
+            # Gametogenesis
+            pop.gam <- StochRound(pop.recom)
+            
+            # Mutations
+            pop.gam <- perfMutation(pop.gam, num.mutes, model)
+          }
+          return(pop.gam)
+
+        }
+        for (q in 1:iter){
+          results <- rbind(results, iter.results[[q]])
+        }
+        
+      }
+      
+    }
+    
+  }
+  
+}
+results <- results[-1,]
+
+write.csv(results, 'fitness_Y_h1.csv')
+
+stopCluster(cl)
+
+
+
+
+
