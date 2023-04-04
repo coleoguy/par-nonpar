@@ -25,7 +25,7 @@ colnames(results) <- c("XE0N","XE0P","XE0U","XE1N","XE1P","XE1U","XS0N","XS0P","
                        "XS1N","XS1P","XS1U","YS0N","YS0P","YS0U","YS1N","YS1P","YS1U")
 # Type of fusions to introduce
 # Possible models: (auto.and.) allXY, allX, allY, nonparX, parX, nonparY, parY
-models <- c("auto.and.nonparY")
+models <- c("auto.and.nonparX")
 for(i in 1:length(models)){
   
   model <- models[i]
@@ -88,7 +88,7 @@ for(i in 1:length(models)){
 }
 results <- results[-1,]
 
-write.csv(results, 'fitness_Y_h1.csv')
+write.csv(results, 'fitness_X_h1.csv')
 
 stopCluster(cl)
 
