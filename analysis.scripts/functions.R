@@ -7,10 +7,16 @@
 # 4) N, P, U for fusion to Non recombining region,
 #    fusion to Par region, or Unfused
 
+
+# Creating the starting population of haploid gametes for the simulation
 getInitialPop <-function(pop.size){
+  # sex determining region (X or Y)
   sdr <- c("X","Y")
+  # gametes in sperm or eggs (S or E)
   gamete <- c("S","E")
+  # Sexually antagonistic allele (0 or 1)
   SA <- 0:1
+  # Chromosome structure, N = non-PAR fusion, P = PAR fusion, U = Unfused
   structure <- c("N","P","U")
   haplotypes <- c()
   for(i in 1:2){
@@ -49,7 +55,7 @@ getInitialPop <-function(pop.size){
 
   # these are our leftovers
   leftover <- pop.size%%4
-
+  # assign leftovers
   if(leftover>0){
     if(sample(c(T,F), 1)){
       x <- sample(c(3,6), 1)
@@ -63,12 +69,14 @@ getInitialPop <-function(pop.size){
   return(gametes)
 }
 
+
+# Create diploid juvenile population from the haploid gametes
 getJuveniles <- function(pop.gam, pop.size){
   pop.mat <- matrix(0,6,12)
   colnames(pop.mat) <- names(pop.gam)[7:18]
   rownames(pop.mat) <- names(pop.gam)[1:6]
 
-  # TODO fix this so that you always maintain population size - I think we fixed it twice
+  
   frac.sperm <- pop.gam[7:18]/sum(pop.gam[7:18])
   frac.eggs <- pop.gam[1:6]/sum(pop.gam[1:6])
   vc <- sample(1:12, pop.size, replace=T, prob = frac.sperm)
@@ -79,44 +87,10 @@ getJuveniles <- function(pop.gam, pop.size){
       pop.mat[j, i] <- sum(vgenos == paste(i, "_", j, sep=""))
     }
   }
-  ########
-  #       TODO If we run well without this lets delete
-  #
-  # extra <- 0
-  # for(i in 1:ncol(pop.mat)){
-  #   for(j in 1:nrow(pop.mat)){
-  #     pop.mat[j, i] <- floor(pop.size * frac.sperm[i] * frac.eggs[j])
-  #     pos.extra <- as.vector(pop.size * frac.sperm[i] * frac.eggs[j] - pop.mat[j, i])
-  #     if(pos.extra != 0){
-  #       extra <- extra + pos.extra
-  #     }
-  #   }
-  # }
-  # extra <- round(extra)
-  # if(extra != 0){
-  #    # hits <- sample(1:72, size=extra, replace=T, prob = as.vector(pop.mat))
-  #
-  #    names <- as.vector(names(pop.gam))
-  #    hits2 <- sample(names[1:6], size = extra, replace = T, prob = as.vector(pop.gam[1:6]))
-  #    hits3 <- sample(names[7:18], size = extra, replace = T, prob = as.vector(pop.gam[7:18]))
-  #    hits1 <- cbind(hits2,hits3)
-  #
-  #    temp.pop <- matrix(0, 6, 12)
-  #    colnames(temp.pop) <- colnames(pop.mat)
-  #    rownames(temp.pop) <- rownames(pop.mat)
-  #
-  #    for(i in 1:extra){
-  #      x <- hits1[i,1]
-  #      y <- hits1[i,2]
-  #      temp.pop[x,y] <- temp.pop[x,y] + 1
-  #    }
-  #
-  #   pop.mat <- pop.mat + temp.pop
-  # }
-  ########
   return(pop.mat)
 }
 
+# Find the fitness of the population
 popFit <- function(pop.juv, s, h){
   genotype.fit.mat  <- matrix(c(1+s, 1+h*s, 1, 
                                 1/(1+s), 1/(1+h*s), 1),
@@ -142,6 +116,7 @@ popFit <- function(pop.juv, s, h){
   return(pop.fit)
 }
 
+# Perform viability selection based on the genotypes present and their fitness
 perfSeln <- function(pop.juv, pop.fits){
   genos <- as.vector(pop.juv)
   geno.fits <- as.vector(pop.fits)
@@ -156,8 +131,7 @@ perfSeln <- function(pop.juv, pop.fits){
     pop.fits[counter: (counter + gen.num - 1)] <- rep(fits.present[i], gen.num)
     counter <- counter + gen.num
   }
-  # TODO
-  # seperate out mothers and fathers surviving
+  
   mothers <- pop.genos[pop.genos < 37]
   fathers <- pop.genos[!pop.genos < 37]
   mothers.fits <- pop.fits[1:length(mothers)]
@@ -174,7 +148,10 @@ perfSeln <- function(pop.juv, pop.fits){
   return(pop.adu)
 }
 
+# Perform gametogenesis from the adult population that survived selection
 perfGameto <- function(pop.adu, r){
+  
+  # table for possible recombination outcomes for females (XX)
   recom.table.xx <- matrix(0,36,6)
   colnames(recom.table.xx) <- c("XE0N", "XE0P", "XE0U", "XE1N", "XE1P", "XE1U")
   recom.table.xx[1, ] <- c(1,0,0,0,0,0)
@@ -220,9 +197,7 @@ perfGameto <- function(pop.adu, r){
                                  "X1P X0N","X1P X0P","X1P X0U","X1P X1N","X1P X1P","X1P X1U",
                                  "X1U X0N","X1U X0P","X1U X0U","X1U X1N","X1U X1P","X1U X1U"
 )
-
-
-  # some of these genotypes are producing no gametes!!
+  # table for possible recombination outcomes for males (XY)
   recom.table.xy <- matrix(0,36,12)
   colnames(recom.table.xy) <- c("XS0N", "XS0P", "XS0U", "XS1N", "XS1P", "XS1U","YS0N", "YS0P", "YS0U", "YS1N", "YS1P", "YS1U")
   recom.table.xy[1, ] <- c(0.5,	0,	0,	0,	0,	0,	0.5,	0,	0,	0,	0,	0)
@@ -270,15 +245,12 @@ perfGameto <- function(pop.adu, r){
   )
   eggs <- colSums(as.vector(pop.adu)[1:36] * recom.table.xx)
   sperm <- colSums(as.vector(pop.adu)[37:72] * recom.table.xy)
-  # currently does nothing
-  #results <- 4 * c(eggs, sperm)
-
-
 
   pop.recom <- c(eggs, sperm)
   return(pop.recom)
 }
 
+# Stochastic rounding to keep gametes as whole numbers
 StochRound = function(pop.recom){
 
   for (i in 1:length(pop.recom))
@@ -300,6 +272,7 @@ StochRound = function(pop.recom){
   return(pop.recom)
 }
 
+# Introduce a new fusion mutation into the model
 perfMutation <- function(pop.gam, num.mutes, model){
   if(num.mutes[i] > 0){
 
@@ -315,27 +288,16 @@ perfMutation <- function(pop.gam, num.mutes, model){
     # 15 = "YS0U" 16 = "YS1N"
     # 17 = "YS1P" 18 = "YS1U"
     if(model == "auto.and.nonparX"){
-      # fuse or fission between par and autosome
+      # fusion or fission between par and autosome
       # this code is specifically for fusion of X nonpar and an autosome
       for(j in 1:num.mutes[i]){
-
-        # foo <- pop.gam[c(3, 6, 9, 12, 1, 4, 7, 10)]
-        # foo <- replace(foo, foo <= 0, 0)
 
         hit <- sample(x = c(3, 6, 9, 12, 1, 4, 7, 10), 1,
                       prob = pop.gam[c(3, 6, 9, 12, 1, 4, 7, 10)])
 
-        # # KW - This sample function will throw if all of the values in prob are 0
-        # hit <- sample(x = c(3, 6, 9, 12), 1,
-        #               prob = pop.gam[c(3, 6, 9, 12)])
-
-        # KW - Changed this temporarily to try and avoid negative numbers of individuals
-
-         #if (pop.gam[hit] > 0) {
         pop.gam[hit] <- pop.gam[hit] - 1
 
-        # TODO fix this as a vector swap so hit 3 =1
-        # hit 6 = 4 etc.
+
         if(hit==3)  pop.gam[1] <- pop.gam[1] + 1
         if(hit==6)  pop.gam[4] <- pop.gam[4] + 1
         if(hit==9)  pop.gam[7] <- pop.gam[7] + 1
@@ -345,13 +307,10 @@ perfMutation <- function(pop.gam, num.mutes, model){
         if(hit==4)  pop.gam[6] <- pop.gam[6] + 1
         if(hit==7)  pop.gam[9] <- pop.gam[9] + 1
         if(hit==10)  pop.gam[12] <- pop.gam[12] + 1
-        # }
-
-
       }
     }
     if(model == "auto.and.parX"){
-      # fuse or fission between par and autosome
+      # fusion or fission between par and autosome
       # this code is specifically for fusion of X par and an autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(3, 6, 9, 12, 2, 5, 8, 11), 1,
@@ -370,7 +329,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
       }
     }
     if(model == "auto.and.nonparY"){
-      # fuse or fission between non par and autosome
+      # fusion or fission between non par and autosome
       # this code is specifically for fusion of Y non par and an autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(15, 18, 13, 16), 1,
@@ -385,7 +344,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
       }
     }
     if(model == "auto.and.parY"){
-      # fuse or fission between par and autosome
+      # fusion or fission between par and autosome
       # this code is specifically for fusion of Y par and an autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(15, 18, 14, 17), 1,
@@ -400,7 +359,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
       }
     }
     if(model == "auto.and.allX"){
-      # fuse or fission between both par and non-par X and autosome
+      # fusion or fission between both par and non-par X and autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(3, 6, 9, 12, 1, 4, 7, 10, 2, 5, 8, 11), 1,
                       prob = pop.gam[c(3, 6, 9, 12, 1, 4, 7, 10, 2, 5, 8, 11)])
@@ -436,7 +395,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
       }
     }
     if(model == "auto.and.allY"){
-      # fuse or fission between par and non-par Y and autosome
+      # fusion or fission between par and non-par Y and autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(15, 18, 14, 17, 13, 16), 1,
                       prob = pop.gam[c(15, 18, 14, 17, 13, 16)])
@@ -464,7 +423,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
       }
     }
     if(model == "auto.and.allXY"){
-      # fuse or fission between both par and non-par X and par and non-par Y and autosome
+      # fusion or fission between both par and non-par X and par and non-par Y and autosome
       for(j in 1:num.mutes[i]){
         hit <- sample(x = c(3, 6, 9, 12, 1, 4, 7, 10, 2, 5, 8, 11, 15, 18, 14, 17, 13, 16), 1,
                       prob = pop.gam[c(3, 6, 9, 12, 1, 4, 7, 10, 2, 5, 8, 11, 15, 18, 14, 17, 13, 16)])
@@ -515,6 +474,7 @@ perfMutation <- function(pop.gam, num.mutes, model){
   return(pop.gam)
 }
 
+# Get allele genotype frequencies for the SAL alleles and fusion genotypes
 GetFreqs <- function(results, val){
 
   # Frequency of the 1 allele
@@ -550,6 +510,7 @@ GetFreqs <- function(results, val){
     simres <- rowSums(results[,c(1,4,7,10)])/rowSums(results[,1:12])
   }
 
+# return simulation results as genotype frequencies
   return(simres)
 }
 

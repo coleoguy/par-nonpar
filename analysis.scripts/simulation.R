@@ -9,16 +9,18 @@ pop.size <- 1000
 mut.prob <- 1/1000
 
 # Generations with columns being gamete types
-generations <- 3
+generations <- 1000
 
 # Set number of clusters
 NumberClusters <- 4
 cl <- makeCluster(NumberClusters, outfile = "")
 registerDoSNOW(cl)
 
-iter <- 5
+# Set number of simulation iterations
+iter <- 100
 iter.results <- list()
 
+# Set up results table
 parsed <- as.data.frame(matrix(NA, 1, 6))
 colnames(parsed) <- c("frqX","frqY","model","h","r","s")
 counter <- 1
@@ -101,6 +103,7 @@ for(o in 1:length(models)){
 
 stopCluster(cl)
 
+# Add fused chromosome data to final table
 X <- data.frame(parsed[, c(1,3:6)])
 Y <- data.frame(parsed[, 2:6])
 colnames(X)[1] <- colnames(Y)[1] <- "Freq"
