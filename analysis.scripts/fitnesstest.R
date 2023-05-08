@@ -31,7 +31,7 @@ for(i in 1:length(models)){
   model <- models[i]
   # Dominance factor of the female benefit allele (allele 1)
   # 1 = dominant, 0.5 = additive, 0 = recessive
-  hs <- c(1)
+  hs <- c(0)
   for(j in 1:length(hs)){
     
     h <- hs[j]
@@ -43,7 +43,7 @@ for(i in 1:length(models)){
       # Selection coefficient for SAL
 
       for(m in 1){
-        s <- c(0.3)
+        s <- c(0.9)
         
         iter.results <- foreach(n = 1:iter,  .verbose = T) %dopar% {
           
@@ -88,7 +88,7 @@ for(i in 1:length(models)){
 }
 results <- results[-1,]
 
-write.csv(results, 'fitness_X_h1.csv')
+write.csv(results, 'testfitness_X_h0_r1_s9.csv')
 
 stopCluster(cl)
 

@@ -1,9 +1,9 @@
-dat0 <- read.csv("fitness/fitness_h0.csv")[,-1]
-dat1 <- read.csv("fitness/fitness_h1.csv")[,-1]
+dat0 <- read.csv("testfitness_X_h0_r1_s9.csv")[,-1]
+dat1 <- read.csv("testfitness_Y_h0_r1_s9.csv")[,-1]
 
 x <- dat0[1,]
 h <- 0
-s <- .3
+s <- .9
 
 getFit <- function(x, h, s){
   fem00 <- (sum(x[,1:3])/sum(x[,1:6])) * (sum(x[,7:9])/sum(x[,7:12]))
@@ -34,12 +34,13 @@ getFit <- function(x, h, s){
 
 fem0 <- fem1 <- mal0 <- mal1 <-c()
 for(i in 1:100){
-  foo <- getFit(dat0[i,], h=0, s=.3)
+  foo <- getFit(dat0[i,], h=0, s=.9)
   mal0[i] <- foo[1]
   fem0[i] <- foo[2]
-  foo <- getFit(dat1[i,], h=1, s=.3)
+  foo <- getFit(dat1[i,], h=0, s=.9)
   mal1[i] <- foo[1]
   fem1[i] <- foo[2]
 }
-
-
+results <- c(mean(fem0), mean(mal0), mean(fem1),mean(mal1))
+names(results) <- c('femX', 'malX', 'femY', 'malY')
+write.csv(results, "results_h0.csv")
