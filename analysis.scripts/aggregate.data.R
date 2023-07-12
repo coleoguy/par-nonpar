@@ -1,7 +1,6 @@
 # this script aggregates results and saves out files for plotting
 library(stringr)
 both <- read.csv("../results/simulation.results.csv")
-res.ver2 <- read.csv("../results/agg.dat.csv")
 modchrom <- rep(NA, 792000)
 for(i in 1:nrow(both)){
   print(i)
@@ -33,4 +32,4 @@ for(i in 1:nrow(dat)){
 }
 dat$chrom <- chrom
 
-write.csv(dat, file = "figure.data.csv")
+write.csv(dat, file = "../results/figure.data.csv")
