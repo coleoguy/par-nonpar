@@ -1,1 +1,0 @@
-manuscript is in google docs
