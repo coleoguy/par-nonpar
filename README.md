@@ -8,3 +8,5 @@ To replciate simulations performed in this paper users can run the file "simulat
 To process output of simulations users can run the file "aggregate.data.R" in the analysis script folder
 
 To produce plots presented in the paper users can each of the scripts in the figures folder.
+
+The results folder contains the results of the simulations that we ran for the publication referenced above.
